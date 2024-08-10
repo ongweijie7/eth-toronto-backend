@@ -5,6 +5,8 @@ import config from "./config.js"
 const app = express()
 const port = config.port
 
+app.use(express.json())
+
 app.use("/weapons", gunsController)
 
 app.get("/", (req, res) => {
