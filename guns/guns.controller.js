@@ -29,8 +29,22 @@ gunsController.get('/owner', async (req, res) => {
     console.log(e.message)
     return JsonResponse.fail(500 ,{ error: e.message }).send(res)
   }
-
 })
+
+// Fetch all guns given an owner address
+gunsController.get('/guns', async (req, res) => {
+  try {
+    const { ownerAddress } = req.query;
+    const registeredGuns = await contract.methods.getGunsByOwner(ownerAddress).call()
+    console.log(registeredGuns)
+    return JsonResponse.success({ "registeredGuns": registeredGuns }).send(res)
+  } catch (e) {
+    console.log(e)
+    return JsonResponse.fail(500 ,{ error: e.message }).send(res)
+  }
+})
+
+
 
 gunsController.post('/register-gun', async (req, res) => {
   try {
@@ -81,8 +95,8 @@ gunsController.put('/transfer-ownership', async (req, res) => {
 })
 
 
-//fetches all registered guns, if a owner address is provided, it fetches all guns owned by that address
-gunsController.get('/guns/all', async (req, res) => {
+//fetches all registered guns, if an owner address is provided, it fetches all guns registered by that address
+gunsController.get('/registered-guns', async (req, res) => {
   try {
     const { ownerAddress } = req.body;
 
