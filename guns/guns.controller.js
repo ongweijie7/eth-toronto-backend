@@ -116,4 +116,34 @@ gunsController.get('/registered-guns', async (req, res) => {
   }
 })
 
+gunsController.get('/history', async (req, res) => {
+  try {
+    const { serialNum } = req.query
+    var hashedGunSerial = await contract.methods.getHashedSerialNum(serialNum).call()
+    const eventList = await contract.getPastEvents("OwnershipTransferred", {
+      filter: {
+          hashedSerial: [hashedGunSerial]
+      },
+      fromBlock: 0,
+      toBlock: 'latest'
+    });
+
+  var historyList = []
+  for (var history of eventList) {
+    historyList.push(
+      {
+        "old": history.returnValues.oldOwner,
+        "new": history.returnValues.newOwner
+      }
+    ) 
+  }
+    return JsonResponse.success({ "ownership history": historyList }).send(res)
+  } catch (e) {
+    console.log(e.message)
+    return JsonResponse.fail(500 ,{ error: e.message }).send(res)
+  }
+})
+
+
+
 export default gunsController
