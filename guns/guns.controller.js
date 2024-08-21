@@ -69,19 +69,20 @@ gunsController.post('/register-gun', async (req, res) => {
   }
 })
 
-//fetches all registered guns, if a owner address is provided, it fetches all guns owned by that address
 gunsController.put('/transfer-ownership', async (req, res) => {
   try {
-    const { serialNum, oldAddress, newOwnerAddress } = req.body;
+    console.log(req.body)
+    const { serialNumber, oldAddress, newAddress } = req.body;
     // get the amount of gas needed
-    const gasEstimate = await contract.methods.transferOwnership(serialNum, newOwnerAddress).estimateGas({
+    const gasEstimate = await contract.methods.transferOwnership(serialNumber, newAddress).estimateGas({
       from: oldAddress
     })
     const gasPrice = await web3.eth.getGasPrice(); //get the gas price in wei
     // Calculate the total gas cost
+    console.log(gasEstimate)
     const totalGasCostWei = gasEstimate * gasPrice;
     const totalGasCostEther = web3.utils.fromWei(totalGasCostWei.toString(), 'ether');
-    const transaction = await contract.methods.transferOwnership(serialNum, newOwnerAddress).send({
+    const transaction = await contract.methods.transferOwnership(serialNumber, newAddress).send({
       from: oldAddress,
       gas: gasEstimate,
       gasPrice: gasPrice
